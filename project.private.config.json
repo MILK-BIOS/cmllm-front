@@ -3,6 +3,7 @@
   "projectname": "TCM_type",
   "setting": {
     "compileHotReLoad": true,
-    "skylineRenderEnable": true
+    "skylineRenderEnable": true,
+    "urlCheck": false
   }
 }

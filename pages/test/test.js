@@ -1,18 +1,49 @@
-// pages/test.js
+// pages/test/test.js
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
-
+    messages: [],
+    inputValue: '',
+    welcome: '',
+    client_id: ''
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad(options) {
+    const { welcome, client_id } = options;
 
+    // 更新页面数据
+    this.setData({
+      welcome: welcome, // 解码传递过来的字符串
+      client_id: client_id,
+    });
+    console.log(client_id);
+    wx.request({
+      url: `https://54b9-58-60-1-30.ngrok-free.app/start?client_id=${client_id}`,
+      method: 'POST',
+      header: {
+        'ngrok-skip-browser-warning': '69420',
+        'Content-Type': 'json', // 告诉服务器请求体是 JSON 格式
+      },
+      data: {
+        client_id: client_id
+      },
+      success: (res) => {
+        if (res.data && res.data.reply && res.data.client_id) {
+          this.setData({
+            messages: [...this.data.messages, { id: Date.now(), type: 'bot', content: res.data.reply }]
+          });
+        }
+      },
+      fail: (err) => {
+        console.error('请求失败', err);
+      }
+    })
   },
 
   /**
@@ -62,5 +93,40 @@ Page({
    */
   onShareAppMessage() {
 
+  },
+
+  onInput(e) {
+    this.setData({
+      inputValue: e.detail.value
+    });
+  },
+
+  sendMessage() {
+    const { inputValue, messages } = this.data;
+    if (!inputValue.trim()) return;
+
+    // 添加用户消息到消息列表
+    const newMessages = [...messages, { id: Date.now(), type: 'user', content: inputValue }];
+    this.setData({
+      messages: newMessages,
+      inputValue: ''
+    });
+
+    // 调用后端接口获取机器人回复
+    wx.request({
+      url: `https://54b9-58-60-1-30.ngrok-free.app/chat?client_id=${this.data.client_id}`, 
+      method: 'POST',
+      data: { message: inputValue },
+      success: (res) => {
+        if (res.data && res.data.reply) {
+          this.setData({
+            messages: [...this.data.messages, { id: Date.now(), type: 'bot', content: res.data.reply }]
+          });
+        }
+      },
+      fail: (err) => {
+        console.error('请求失败', err);
+      }
+    });
   }
 })

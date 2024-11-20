@@ -36,9 +36,8 @@ Component({
       })
     },
     getUserProfile(e) {
-      // 推荐使用wx.getUserProfile获取用户信息，开发者每次通过该接口获取用户个人信息均需用户确认，开发者妥善保管用户快速填写的头像昵称，避免重复弹窗
       wx.getUserProfile({
-        desc: '展示用户信息', // 声明获取用户个人信息后的用途，后续会展示在弹窗中，请谨慎填写
+        desc: '展示用户信息',
         success: (res) => {
           console.log(res)
           this.setData({
@@ -48,5 +47,33 @@ Component({
         }
       })
     },
+    click() {
+      wx.request({
+        url: 'https://54b9-58-60-1-30.ngrok-free.app/hello', 
+        method: 'POST',
+        header: {
+          'ngrok-skip-browser-warning': '69420',
+          'Content-Type': 'json', // 告诉服务器请求体是 JSON 格式
+        },
+        success: (res) => {
+          if (res.data && res.data.reply) {
+            // 请求成功后，跳转到目标页面并传递数据
+            wx.navigateTo({
+              url: `../test/test?welcome=${res.data.reply}&client_id=${res.data.client_id}`,
+            });
+          }
+          console.log(res.data);
+        },
+        fail: (err) => {
+          console.error('请求失败', err);
+        }
+      });
+    },
+    // 新增的跳转函数
+    navigateToLogs() {
+      wx.navigateTo({
+        url: '../logs/logs'
+      })
+    }
   },
 })

@@ -1,2 +1,19 @@
-<!--pages/test.wxml-->
-<text>pages/test.wxml</text>
+<!-- pages/test/test.wxml -->
+<view class="container">
+  <view class="chat-window">
+    <scroll-view class="chat-content" style="width:50vh;height:100vh" scroll-y>
+    <view class="message.bot">
+      <text>{{welcome}}</text>
+    </view>
+      <block wx:for="{{messages}}" wx:key="id">
+        <view class="message {{item.type}}">
+          <text>{{item.content}}</text>
+        </view>
+      </block>
+    </scroll-view>
+  </view>
+  <view class="input-area">
+    <input class="input-box" placeholder="输入消息..." style="width: 500rpx;height: 60rpx;" bindinput="onInput" value="{{inputValue}}" />
+    <button class="send-button" bindtap="sendMessage" style="width: 80rpx;height: 80rpx;">发送</button>
+  </view>
+</view>

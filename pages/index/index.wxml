@@ -24,5 +24,7 @@
     <view class="usermotto">
       <text class="user-motto">{{motto}}</text>
     </view>
+    <button bindtap="click">Go to Test Page</button>
+    <!-- 新增的跳转按钮 -->
   </view>
 </scroll-view>
