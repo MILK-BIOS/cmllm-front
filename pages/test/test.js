@@ -120,6 +120,7 @@ Page({
       messages: newMessages,
       inputValue: ''
     });
+    this.autoScroll();
 
     // 调用后端接口获取机器人回复
     wx.request({
@@ -136,7 +137,6 @@ Page({
 
           // 自动滚动到底部
           this.autoScroll();
-
           if (res.data.finish) {
             wx.navigateTo({
               url: `../result/result?client_id=${client_id}`,
@@ -174,11 +174,18 @@ Page({
       // 计算实际需要滚动的高度
       const scrollHeight = res.scrollHeight; // 内容总高度
       const currentScrollTop = res.scrollTop; // 当前滚动位置
-
       that.setData({
-        scrollTop: currentScrollTop // 增量滚动
+        scrollTop: currentScrollTop + (scrollHeight - currentScrollTop)*50 // 增量滚动
       });
     }).exec();
   },
-  
+  pageScrollToBottom: function() {
+    wx.createSelectorQuery().select('.chat-content').boundingClientRect(function(rect){
+      // 使页面滚动到底部
+      wx.pageScrollTo({
+        selector: rect,
+        scrollOffset: rect.height
+      })
+    }).exec()
+  },
 })
