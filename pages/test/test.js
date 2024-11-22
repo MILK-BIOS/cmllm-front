@@ -122,11 +122,30 @@ Page({
           this.setData({
             messages: [...this.data.messages, { id: Date.now(), type: 'bot', content: res.data.reply }]
           });
+
+          if (res.data.finish){
+            wx.navigateTo({
+              url: `../result/result?client_id=${this.data.client_id}`,
+            });
+          }
         }
       },
       fail: (err) => {
         console.error('请求失败', err);
       }
     });
-  }
+  },
+
+  autoScroll() {
+    let that = this
+    let query = wx.createSelectorQuery()
+    // 通过class选择器定位到scorll-view
+    query.select('.chat-content').boundingClientRect(res => {
+        that.setData({
+            // 由于res.height效果不明显，所以乘以100系数，这个系数可以根据实际效果调整
+            scrollTop: res.height * 100
+        })
+    })
+    query.exec(res => {})
+  },
 })

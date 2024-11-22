@@ -1,0 +1,7 @@
+<!-- pages/result/result.wxml -->
+<view class="container">
+  <image src="{{image}}" mode="widthFix" class="result-image"></image>
+  <scroll-view class="result-text-scroll" scroll-y>
+    <text class="result-text">{{resultText}}</text>
+  </scroll-view>
+</view>

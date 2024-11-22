@@ -1,12 +1,12 @@
 <!-- pages/test/test.wxml -->
 <view class="container">
   <view class="chat-window">
-    <scroll-view class="chat-content" style="width:50vh;height:100vh" scroll-y>
+    <scroll-view class="chat-content" style="width:50vh;height:100vh;" scroll-y>
     <view class="message.bot">
       <text>{{welcome}}</text>
     </view>
       <block wx:for="{{messages}}" wx:key="id">
-        <view class="message {{item.type}}">
+        <view class="message {{item.type}}" style="width: max-content;">
           <text>{{item.content}}</text>
         </view>
       </block>
