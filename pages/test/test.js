@@ -8,7 +8,10 @@ Page({
     messages: [],
     inputValue: '',
     welcome: '',
-    client_id: ''
+    client_id: '',
+    scrollTop: 0, // 添加 scrollTop 数据字段
+    inputDisabled: false, // 添加 inputDisabled 数据字段
+    buttonDisabled: false // 添加 buttonDisabled 数据字段
   },
 
   /**
@@ -102,8 +105,14 @@ Page({
   },
 
   sendMessage() {
-    const { inputValue, messages } = this.data;
+    const { inputValue, messages, client_id } = this.data;
     if (!inputValue.trim()) return;
+
+    // 禁用输入框和发送按钮
+    this.setData({
+      inputDisabled: true,
+      buttonDisabled: true
+    });
 
     // 添加用户消息到消息列表
     const newMessages = [...messages, { id: Date.now(), type: 'user', content: inputValue }];
@@ -114,38 +123,62 @@ Page({
 
     // 调用后端接口获取机器人回复
     wx.request({
-      url: `https://54b9-58-60-1-30.ngrok-free.app/chat?client_id=${this.data.client_id}`, 
+      url: `https://54b9-58-60-1-30.ngrok-free.app/chat?client_id=${client_id}`,
       method: 'POST',
       data: { message: inputValue },
       success: (res) => {
         if (res.data && res.data.reply) {
           this.setData({
-            messages: [...this.data.messages, { id: Date.now(), type: 'bot', content: res.data.reply }]
+            messages: [...this.data.messages, { id: Date.now(), type: 'bot', content: res.data.reply }],
+            inputDisabled: false, // 重新启用输入框
+            buttonDisabled: false // 重新启用发送按钮
           });
 
-          if (res.data.finish){
+          // 自动滚动到底部
+          this.autoScroll();
+
+          if (res.data.finish) {
             wx.navigateTo({
-              url: `../result/result?client_id=${this.data.client_id}`,
+              url: `../result/result?client_id=${client_id}`,
             });
           }
         }
       },
       fail: (err) => {
         console.error('请求失败', err);
+        // 重新启用输入框和发送按钮
+        this.setData({
+          inputDisabled: false,
+          buttonDisabled: false
+        });
       }
     });
   },
 
-  autoScroll() {
-    let that = this
-    let query = wx.createSelectorQuery()
-    // 通过class选择器定位到scorll-view
-    query.select('.chat-content').boundingClientRect(res => {
-        that.setData({
-            // 由于res.height效果不明显，所以乘以100系数，这个系数可以根据实际效果调整
-            scrollTop: res.height * 100
-        })
-    })
-    query.exec(res => {})
+  checkScroll() {
+    let that = this;
+    let query = wx.createSelectorQuery();
+    query.select('.chat-content').boundingClientRect(function (res) {
+      if (res.height > that.data.scrollTop) {
+        that.autoScroll();
+      }
+    }).exec();
   },
+
+  autoScroll() {
+    let that = this;
+    let query = wx.createSelectorQuery();
+  
+    // 通过 class 选择器定位到 scroll-view
+    query.select('.chat-content').scrollOffset(function (res) {
+      // 计算实际需要滚动的高度
+      const scrollHeight = res.scrollHeight; // 内容总高度
+      const currentScrollTop = res.scrollTop; // 当前滚动位置
+
+      that.setData({
+        scrollTop: currentScrollTop // 增量滚动
+      });
+    }).exec();
+  },
+  
 })
